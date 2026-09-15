@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.superuser
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -146,49 +147,54 @@ private fun PolicyCard(
     onDetail: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    GlassCard(
-        onClick = onDetail,
+    Box(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .clickable { onDetail() }
             .alpha(if (item.isEnabled) 1f else 0.5f),
-        shape = RoundedCornerShape(20.dp),
     ) {
-        ListItem(
-            leadingContent = {
-                Image(
-                    painter = rememberDrawablePainter(item.icon),
-                    contentDescription = item.appName,
-                    modifier = Modifier.size(40.dp)
-                )
-            },
-            headlineContent = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.weight(1f, fill = false),
+        GlassCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+        ) {
+            ListItem(
+                leadingContent = {
+                    Image(
+                        painter = rememberDrawablePainter(item.icon),
+                        contentDescription = item.appName,
+                        modifier = Modifier.size(40.dp)
                     )
-                    if (item.isSharedUid) {
-                        Spacer(Modifier.width(6.dp))
-                        SharedUidBadge()
+                },
+                headlineContent = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = item.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f, fill = false),
+                        )
+                        if (item.isSharedUid) {
+                            Spacer(Modifier.width(6.dp))
+                            SharedUidBadge()
+                        }
                     }
-                }
-            },
-            supportingContent = {
-                Text(
-                    text = item.packageName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            trailingContent = {
-                Switch(
-                    checked = item.isEnabled,
-                    onCheckedChange = { onToggle() }
-                )
-            },
-            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-        )
+                },
+                supportingContent = {
+                    Text(
+                        text = item.packageName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                trailingContent = {
+                    Switch(
+                        checked = item.isEnabled,
+                        onCheckedChange = { onToggle() }
+                    )
+                },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+            )
+        }
     }
 }
 
