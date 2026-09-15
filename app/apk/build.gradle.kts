@@ -37,6 +37,10 @@ dependencies {
     implementation(project(":core"))
     coreLibraryDesugaring(libs.jdk.libs)
 
+    // Liquid Glass engine (vendored Kyant0/backdrop) — used by @Language annotations
+    // on the AGSL shader source strings in ui/glass/backdrop/internal/Shaders.kt
+    implementation(libs.jetbrains.annotations)
+
     // Compose
     implementation(libs.compose.ui)
     implementation(libs.accompanist.drawablepainter)

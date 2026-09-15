@@ -17,6 +17,7 @@ navigationevent = "1.1.2"
 wire = "6.4.7"
 
 [libraries]
+jetbrains-annotations = { module = "org.jetbrains:annotations", version = "26.0.2" }
 bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.85" }
 commons-compress = { module = "org.apache.commons:commons-compress", version = "1.28.0" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }

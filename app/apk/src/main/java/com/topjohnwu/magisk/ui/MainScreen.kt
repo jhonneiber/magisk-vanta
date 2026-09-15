@@ -20,10 +20,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShortNavigationBar
-import androidx.compose.material3.ShortNavigationBarItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -53,6 +52,11 @@ import com.topjohnwu.magisk.ui.settings.SettingsScreen
 import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
+import com.topjohnwu.magisk.ui.glass.LiquidTabBar
+import com.topjohnwu.magisk.ui.glass.LiquidTabItem
+import com.topjohnwu.magisk.ui.glass.LocalAppBackdrop
+import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.layerBackdrop
+import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.rememberLayerBackdrop
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -86,26 +90,30 @@ fun MainScreen(
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
     var moduleFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
+    val rootBackdrop = rememberLayerBackdrop()
+    val tabItems = visibleTabs.map { tab ->
+        LiquidTabItem(
+            icon = ImageVector.vectorResource(tab.iconRes),
+            label = stringResource(tab.titleRes),
+        )
+    }
 
+    CompositionLocalProvider(
+        LocalAppBackdrop provides rootBackdrop
+    ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        containerColor = Color.Transparent,
         bottomBar = {
-            ShortNavigationBar {
-                visibleTabs.forEachIndexed { index, tab ->
-                    ShortNavigationBarItem(
-                        selected = pagerState.currentPage == index,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                        icon = {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(tab.iconRes),
-                                contentDescription = stringResource(tab.titleRes),
-                            )
-                        },
-                        label = { Text(stringResource(tab.titleRes)) },
-                    )
-                }
-            }
+            LiquidTabBar(
+                tabs = tabItems,
+                selectedTabIndex = { pagerState.currentPage },
+                onTabSelected = { index ->
+                    scope.launch { pagerState.animateScrollToPage(index) }
+                },
+                backdrop = rootBackdrop,
+            )
         },
         floatingActionButton = {
             AnimatedVisibility(
@@ -131,6 +139,7 @@ fun MainScreen(
             state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
+                .layerBackdrop(rootBackdrop)
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding),
             beyondViewportPageCount = visibleTabs.size - 1,
@@ -196,5 +205,6 @@ fun MainScreen(
                 }
             }
         }
+    }
     }
 }

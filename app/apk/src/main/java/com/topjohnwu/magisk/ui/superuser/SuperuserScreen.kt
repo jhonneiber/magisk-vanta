@@ -19,8 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import com.topjohnwu.magisk.ui.glass.GlassCard
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,7 +27,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
+import com.topjohnwu.magisk.ui.glass.GlassSwitchCompat as Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -147,13 +146,12 @@ private fun PolicyCard(
     onDetail: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    GlassCard(
         onClick = onDetail,
         modifier = modifier
             .fillMaxWidth()
             .alpha(if (item.isEnabled) 1f else 0.5f),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         ListItem(
             leadingContent = {
