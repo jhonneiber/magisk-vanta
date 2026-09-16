@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,14 +53,9 @@ import com.topjohnwu.magisk.ui.settings.SettingsScreen
 import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import com.topjohnwu.magisk.ui.glass.GlassEffectConfig
 import com.topjohnwu.magisk.ui.glass.LiquidTabBar
 import com.topjohnwu.magisk.ui.glass.LiquidTabItem
 import com.topjohnwu.magisk.ui.glass.LocalAppBackdrop
-import com.topjohnwu.magisk.ui.glass.LocalGlassEffectConfig
-import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.layerBackdrop
-import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.rememberLayerBackdrop
-import androidx.compose.ui.graphics.Brush
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -95,7 +89,7 @@ fun MainScreen(
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
     var moduleFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
-    val backgroundBackdrop = rememberLayerBackdrop()
+    val backdrop = LocalAppBackdrop.current
     val tabItems = visibleTabs.map { tab ->
         LiquidTabItem(
             icon = ImageVector.vectorResource(tab.iconRes),
@@ -103,39 +97,20 @@ fun MainScreen(
         )
     }
 
-    CompositionLocalProvider(
-        LocalAppBackdrop provides backgroundBackdrop,
-        LocalGlassEffectConfig provides remember { GlassEffectConfig() },
-    ) {
-        Box(modifier = modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .layerBackdrop(backgroundBackdrop)
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primaryContainer,
-                                MaterialTheme.colorScheme.surface,
-                                MaterialTheme.colorScheme.tertiaryContainer,
-                            )
-                        )
-                    )
-            )
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                containerColor = Color.Transparent,
-                bottomBar = {
-                    LiquidTabBar(
-                        tabs = tabItems,
-                        selectedTabIndex = { pagerState.currentPage },
-                        onTabSelected = { index ->
-                            scope.launch { pagerState.animateScrollToPage(index) }
-                        },
-                        backdrop = backgroundBackdrop,
-                    )
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        containerColor = Color.Transparent,
+        bottomBar = {
+            LiquidTabBar(
+                tabs = tabItems,
+                selectedTabIndex = { pagerState.currentPage },
+                onTabSelected = { index ->
+                    scope.launch { pagerState.animateScrollToPage(index) }
                 },
+                backdrop = backdrop,
+            )
+        },
                 floatingActionButton = {
                     AnimatedVisibility(
                         visible = isModulesTab && moduleFabAction != null,
@@ -226,6 +201,4 @@ fun MainScreen(
             }
         }
     }
-    } // Box
-    } // CompositionLocalProvider
 }

@@ -11,17 +11,26 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalResources
+import com.topjohnwu.magisk.ui.glass.GlassEffectConfig
+import com.topjohnwu.magisk.ui.glass.LocalAppBackdrop
+import com.topjohnwu.magisk.ui.glass.LocalGlassEffectConfig
+import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.layerBackdrop
+import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.rememberLayerBackdrop
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -112,9 +121,28 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
 
         setContent {
             MagiskTheme {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    val navigator = rememberNavigator(Route.Main)
-                    CompositionLocalProvider(LocalNavigator provides navigator) {
+                val backgroundBackdrop = rememberLayerBackdrop()
+                CompositionLocalProvider(
+                    LocalAppBackdrop provides backgroundBackdrop,
+                    LocalGlassEffectConfig provides remember { GlassEffectConfig() },
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .layerBackdrop(backgroundBackdrop)
+                                .background(
+                                    Brush.linearGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colorScheme.primaryContainer,
+                                            MaterialTheme.colorScheme.surface,
+                                            MaterialTheme.colorScheme.tertiaryContainer,
+                                        )
+                                    )
+                                )
+                        )
+                        val navigator = rememberNavigator(Route.Main)
+                        CompositionLocalProvider(LocalNavigator provides navigator) {
                         HandleFlashIntent(navigator)
 
                         NavDisplay(
@@ -201,6 +229,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                             showShortcutPrompt.value = false
                         }
                     )
+                }
                 }
             }
         }

@@ -17,11 +17,17 @@ import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.VMFactory
+import com.topjohnwu.magisk.ui.glass.GlassEffectConfig
+import com.topjohnwu.magisk.ui.glass.LocalAppBackdrop
+import com.topjohnwu.magisk.ui.glass.LocalGlassEffectConfig
+import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.rememberLayerBackdrop
 import com.topjohnwu.magisk.core.base.ActivityExtension
 import com.topjohnwu.magisk.core.base.UntrackedActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
@@ -84,8 +90,13 @@ class SuRequestActivity : ComponentActivity(), UntrackedActivity {
 
         setContent {
             MagiskTheme {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    SuRequestScreen(viewModel = viewModel)
+                CompositionLocalProvider(
+                    LocalAppBackdrop provides rememberLayerBackdrop(),
+                    LocalGlassEffectConfig provides remember { GlassEffectConfig() },
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        SuRequestScreen(viewModel = viewModel)
+                    }
                 }
             }
         }
