@@ -259,29 +259,13 @@ private fun ModuleCard(
     var expanded by rememberSaveable(item.module.id) { mutableStateOf(false) }
     val hasDescription = item.module.description.isNotBlank()
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .then(
-                if (hasDescription) Modifier else Modifier
-            ),
+    GlassCard(
+        onClick = if (hasDescription) { { expanded = !expanded } } else null,
+        enabled = hasDescription,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
     ) {
-        GlassCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (hasDescription) {
-                        Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .clickable { expanded = !expanded }
-                    } else {
-                        Modifier
-                    }
-                ),
-            shape = RoundedCornerShape(20.dp),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
                 Column(modifier = Modifier.alpha(infoAlpha)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
