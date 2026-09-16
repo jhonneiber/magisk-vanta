@@ -95,7 +95,7 @@ fun MainScreen(
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
     var moduleFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
-    val rootBackdrop = rememberLayerBackdrop()
+    val backgroundBackdrop = rememberLayerBackdrop()
     val tabItems = visibleTabs.map { tab ->
         LiquidTabItem(
             icon = ImageVector.vectorResource(tab.iconRes),
@@ -104,66 +104,67 @@ fun MainScreen(
     }
 
     CompositionLocalProvider(
-        LocalAppBackdrop provides rootBackdrop,
+        LocalAppBackdrop provides backgroundBackdrop,
         LocalGlassEffectConfig provides remember { GlassEffectConfig() },
     ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.surface,
-                        MaterialTheme.colorScheme.tertiaryContainer,
+        Box(modifier = modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .layerBackdrop(backgroundBackdrop)
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.surface,
+                                MaterialTheme.colorScheme.tertiaryContainer,
+                            )
+                        )
                     )
-                )
             )
-    ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        containerColor = Color.Transparent,
-        bottomBar = {
-            LiquidTabBar(
-                tabs = tabItems,
-                selectedTabIndex = { pagerState.currentPage },
-                onTabSelected = { index ->
-                    scope.launch { pagerState.animateScrollToPage(index) }
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                containerColor = Color.Transparent,
+                bottomBar = {
+                    LiquidTabBar(
+                        tabs = tabItems,
+                        selectedTabIndex = { pagerState.currentPage },
+                        onTabSelected = { index ->
+                            scope.launch { pagerState.animateScrollToPage(index) }
+                        },
+                        backdrop = backgroundBackdrop,
+                    )
                 },
-                backdrop = rootBackdrop,
-            )
-        },
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = isModulesTab && moduleFabAction != null,
-                enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut(),
-            ) {
-                FloatingActionButton(
-                    onClick = { moduleFabAction?.invoke() },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(CoreR.string.module_action_install_external),
-                        modifier = Modifier.size(28.dp),
-                    )
+                floatingActionButton = {
+                    AnimatedVisibility(
+                        visible = isModulesTab && moduleFabAction != null,
+                        enter = scaleIn() + fadeIn(),
+                        exit = scaleOut() + fadeOut(),
+                    ) {
+                        FloatingActionButton(
+                            onClick = { moduleFabAction?.invoke() },
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = stringResource(CoreR.string.module_action_install_external),
+                                modifier = Modifier.size(28.dp),
+                            )
+                        }
+                    }
                 }
-            }
-        }
-    ) { innerPadding ->
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxSize()
-                .layerBackdrop(rootBackdrop)
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
-            beyondViewportPageCount = visibleTabs.size - 1,
-            userScrollEnabled = true,
-        ) { page ->
+            ) { innerPadding ->
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .consumeWindowInsets(innerPadding),
+                    beyondViewportPageCount = visibleTabs.size - 1,
+                    userScrollEnabled = true,
+                ) { page ->
             val isCurrentPage = pagerState.currentPage == page
             when (visibleTabs[page]) {
                 Tab.HOME -> {
