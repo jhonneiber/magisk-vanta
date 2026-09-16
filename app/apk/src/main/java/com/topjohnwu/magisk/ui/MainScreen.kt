@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,11 +54,14 @@ import com.topjohnwu.magisk.ui.settings.SettingsScreen
 import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
+import com.topjohnwu.magisk.ui.glass.GlassEffectConfig
 import com.topjohnwu.magisk.ui.glass.LiquidTabBar
 import com.topjohnwu.magisk.ui.glass.LiquidTabItem
 import com.topjohnwu.magisk.ui.glass.LocalAppBackdrop
+import com.topjohnwu.magisk.ui.glass.LocalGlassEffectConfig
 import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.layerBackdrop
 import com.topjohnwu.magisk.ui.glass.backdrop.backdrops.rememberLayerBackdrop
+import androidx.compose.ui.graphics.Brush
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -99,7 +104,21 @@ fun MainScreen(
     }
 
     CompositionLocalProvider(
-        LocalAppBackdrop provides rootBackdrop
+        LocalAppBackdrop provides rootBackdrop,
+        LocalGlassEffectConfig provides remember { GlassEffectConfig() },
+    ) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.tertiaryContainer,
+                    )
+                )
+            )
     ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -206,5 +225,6 @@ fun MainScreen(
             }
         }
     }
-    }
+    } // Box
+    } // CompositionLocalProvider
 }
