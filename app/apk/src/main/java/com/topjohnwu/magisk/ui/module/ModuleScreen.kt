@@ -434,7 +434,6 @@ private fun ModuleCard(
             }
         }
     }
-}
 
 @Composable
 private fun OnlineModuleDialog(
