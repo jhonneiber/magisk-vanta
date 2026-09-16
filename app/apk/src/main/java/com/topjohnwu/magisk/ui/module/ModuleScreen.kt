@@ -55,7 +55,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
@@ -259,174 +258,128 @@ private fun ModuleCard(
     var expanded by rememberSaveable(item.module.id) { mutableStateOf(false) }
     val hasDescription = item.module.description.isNotBlank()
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .then(
-                if (hasDescription) Modifier else Modifier
-            ),
+    GlassCard(
+        onClick = if (hasDescription) {{ expanded = !expanded }} else null,
+        enabled = hasDescription,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
     ) {
-        GlassCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (hasDescription) {
-                        Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .clickable { expanded = !expanded }
-                    } else {
-                        Modifier
-                    }
-                ),
-            shape = RoundedCornerShape(20.dp),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Column(modifier = Modifier.alpha(infoAlpha)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+        Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.alpha(infoAlpha)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 4.dp)
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 4.dp)
-                        ) {
-                            Text(
-                                text = item.module.name,
-                                style = MaterialTheme.typography.titleMedium,
-                                textDecoration = strikeThrough,
-                            )
-                            Spacer(Modifier.height(2.dp))
-                            Text(
-                                text = stringResource(
-                                    CoreR.string.module_version_author,
-                                    item.module.version,
-                                    item.module.author
-                                ),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = colorScheme.onSurfaceVariant,
-                                textDecoration = strikeThrough,
-                            )
-                        }
-                        Switch(
-                            checked = item.isEnabled,
-                            onCheckedChange = { viewModel.toggleEnabled(item) }
+                        Text(
+                            text = item.module.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            textDecoration = strikeThrough,
+                        )
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = stringResource(
+                                CoreR.string.module_version_author,
+                                item.module.version,
+                                item.module.author
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colorScheme.onSurfaceVariant,
+                            textDecoration = strikeThrough,
                         )
                     }
+                    Switch(
+                        checked = item.isEnabled,
+                        onCheckedChange = { viewModel.toggleEnabled(item) }
+                    )
+                }
 
-                    if (hasDescription) {
-                        Box(
-                            modifier = Modifier
-                                .padding(top = 6.dp)
-                                .animateContentSize(
-                                    animationSpec = spring(
-                                        dampingRatio = Spring.DampingRatioLowBouncy,
-                                        stiffness = Spring.StiffnessMedium
-                                    )
+                if (hasDescription) {
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .animateContentSize(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                    stiffness = Spring.StiffnessMedium
                                 )
-                        ) {
-                            Text(
-                                text = item.module.description,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = colorScheme.onSurfaceVariant,
-                                textDecoration = strikeThrough,
-                                overflow = if (expanded) TextOverflow.Clip else TextOverflow.Ellipsis,
-                                maxLines = if (expanded) Int.MAX_VALUE else 3,
                             )
-                        }
-                    }
-
-                    if (item.showNotice) {
-                        Spacer(Modifier.height(6.dp))
+                    ) {
                         Text(
-                            text = textHolder(item.noticeText),
+                            text = item.module.description,
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = colorScheme.primary,
+                            color = colorScheme.onSurfaceVariant,
+                            textDecoration = strikeThrough,
+                            overflow = if (expanded) TextOverflow.Clip else TextOverflow.Ellipsis,
+                            maxLines = if (expanded) Int.MAX_VALUE else 3,
                         )
                     }
                 }
 
-                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                if (item.showNotice) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = textHolder(item.noticeText),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = colorScheme.primary,
+                    )
+                }
+            }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    AnimatedVisibility(
-                        visible = item.isEnabled && !item.isRemoved,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            if (item.showAction) {
-                                FilledTonalButton(
-                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-                                    onClick = { viewModel.runAction(item.module.id, item.module.name) },
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AnimatedVisibility(
+                    visible = item.isEnabled && !item.isRemoved,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (item.showAction) {
+                            FilledTonalButton(
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                                onClick = { viewModel.runAction(item.module.id, item.module.name) },
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    ) {
-                                        Icon(
-                                            modifier = Modifier.size(18.dp),
-                                            imageVector = Icons.Default.PlayArrow,
-                                            contentDescription = stringResource(CoreR.string.module_action)
-                                        )
-                                        Text(
-                                            text = stringResource(CoreR.string.module_action),
-                                            style = MaterialTheme.typography.labelLarge,
-                                        )
-                                    }
+                                    Icon(
+                                        modifier = Modifier.size(18.dp),
+                                        imageVector = Icons.Default.PlayArrow,
+                                        contentDescription = stringResource(CoreR.string.module_action)
+                                    )
+                                    Text(
+                                        text = stringResource(CoreR.string.module_action),
+                                        style = MaterialTheme.typography.labelLarge,
+                                    )
                                 }
                             }
                         }
                     }
+                }
 
-                    Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(1f))
 
-                    AnimatedVisibility(
-                        visible = item.showUpdate && item.updateReady,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        FilledTonalButton(
-                            modifier = Modifier.padding(end = 8.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = colorScheme.tertiaryContainer,
-                                contentColor = colorScheme.onTertiaryContainer
-                            ),
-                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-                            onClick = { onUpdateClick(item.module.updateInfo) },
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                Icon(
-                                    modifier = Modifier.size(18.dp),
-                                    imageVector = Icons.Default.CloudUpload,
-                                    contentDescription = stringResource(CoreR.string.update),
-                                )
-                                Text(
-                                    text = stringResource(CoreR.string.update),
-                                    style = MaterialTheme.typography.labelLarge,
-                                )
-                            }
-                        }
-                    }
-
+                AnimatedVisibility(
+                    visible = item.showUpdate && item.updateReady,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
                     FilledTonalButton(
-                        colors = if (item.isRemoved) {
-                            ButtonDefaults.filledTonalButtonColors()
-                        } else {
-                            ButtonDefaults.filledTonalButtonColors(
-                                containerColor = colorScheme.errorContainer,
-                                contentColor = colorScheme.onErrorContainer
-                            )
-                        },
+                        modifier = Modifier.padding(end = 8.dp),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = colorScheme.tertiaryContainer,
+                            contentColor = colorScheme.onTertiaryContainer
+                        ),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-                        onClick = { viewModel.toggleRemove(item) },
-                        enabled = !item.isUpdated
+                        onClick = { onUpdateClick(item.module.updateInfo) },
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -434,17 +387,46 @@ private fun ModuleCard(
                         ) {
                             Icon(
                                 modifier = Modifier.size(18.dp),
-                                imageVector = if (item.isRemoved) Icons.AutoMirrored.Filled.Undo else Icons.Default.Delete,
-                                contentDescription = null
+                                imageVector = Icons.Default.CloudUpload,
+                                contentDescription = stringResource(CoreR.string.update),
                             )
                             Text(
-                                text = stringResource(
-                                    if (item.isRemoved) CoreR.string.module_state_restore
-                                    else CoreR.string.module_state_remove
-                                ),
+                                text = stringResource(CoreR.string.update),
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         }
+                    }
+                }
+
+                FilledTonalButton(
+                    colors = if (item.isRemoved) {
+                        ButtonDefaults.filledTonalButtonColors()
+                    } else {
+                        ButtonDefaults.filledTonalButtonColors(
+                            containerColor = colorScheme.errorContainer,
+                            contentColor = colorScheme.onErrorContainer
+                        )
+                    },
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                    onClick = { viewModel.toggleRemove(item) },
+                    enabled = !item.isUpdated
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(18.dp),
+                            imageVector = if (item.isRemoved) Icons.AutoMirrored.Filled.Undo else Icons.Default.Delete,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(
+                                if (item.isRemoved) CoreR.string.module_state_restore
+                                else CoreR.string.module_state_remove
+                            ),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
                     }
                 }
             }
