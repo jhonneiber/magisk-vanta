@@ -30,11 +30,13 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -704,7 +706,7 @@ private fun HomeStatsRow(
     ) {
         HomeStatPill(
             modifier = Modifier.weight(1f),
-            icon = androidx.compose.material.icons.Icons.Default.Extension,
+            icon = Icons.Default.Extension,
             count = moduleCount,
             label = stringResource(CoreR.string.modules),
             onClick = onModulesClick,
@@ -712,7 +714,7 @@ private fun HomeStatsRow(
         if (showSuperuser) {
             HomeStatPill(
                 modifier = Modifier.weight(1f),
-                icon = androidx.compose.material.icons.Icons.Default.Shield,
+                icon = Icons.Default.Shield,
                 count = suGrantedCount,
                 label = stringResource(CoreR.string.superuser),
                 onClick = onSuperuserClick,
