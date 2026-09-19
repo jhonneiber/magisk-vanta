@@ -58,4 +58,7 @@ dependencies {
     implementation(libs.navigationevent.compose)
     implementation(libs.lifecycle.viewmodel.navigation3)
     implementation(libs.navigation3.ui)
+
+    // WebUI (module webroot/ rendering)
+    implementation(libs.webkit)
 }

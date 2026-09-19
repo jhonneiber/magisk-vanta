@@ -66,6 +66,8 @@ import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.navigation.rememberNavigator
 import com.topjohnwu.magisk.ui.superuser.SuperuserDetailScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
+import com.topjohnwu.magisk.ui.webui.WebUiScreen
+import com.topjohnwu.magisk.ui.webui.WebUiViewModel
 import com.topjohnwu.magisk.view.Shortcuts
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -209,6 +211,15 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                         }
                                     }
                                     ActionScreen(vm, actionName = key.name, onBack = { navigator.pop() })
+                                }
+                                entry<Route.WebUi> { key ->
+                                    val vm: WebUiViewModel = viewModel(factory = VMFactory)
+                                    LaunchedEffect(key) {
+                                        vm.moduleId = key.id
+                                        vm.moduleName = key.name
+                                        vm.checkRootAccess()
+                                    }
+                                    WebUiScreen(vm, moduleName = key.name, onBack = { navigator.pop() })
                                 }
                             }
                         )
