@@ -2,6 +2,9 @@
 
 Base: official `topjohnwu/Magisk` source.
 
+**Maintainer:** Jhonneiber Andrade
+— [GitHub](https://github.com/jhonneiber) · [Telegram](https://t.me/Jhonneiber18)
+
 ## What's done
 
 - `app/apk/.../ui/glass/backdrop/` — full Liquid Glass rendering engine

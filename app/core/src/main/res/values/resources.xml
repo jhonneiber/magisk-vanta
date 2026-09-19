@@ -13,6 +13,7 @@
     <string name="twitter" translatable="false">Twitter</string>
     <string name="github" translatable="false">GitHub</string>
     <string name="sponsor" translatable="false">Sponsor</string>
+    <string name="telegram" translatable="false">Telegram</string>
 
     <drawable name="ic_launcher">@drawable/ic_logo</drawable>
 

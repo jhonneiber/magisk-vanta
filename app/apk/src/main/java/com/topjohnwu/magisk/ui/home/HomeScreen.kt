@@ -814,6 +814,10 @@ private val developers = listOf(
         LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://x.com/canyie2977"),
         LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/canyie"),
     )),
+    DeveloperInfo("Jhonneiber", listOf(
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/jhonneiber"),
+        LinkInfo(CoreR.string.telegram, CoreR.drawable.ic_telegram, "https://t.me/Jhonneiber18"),
+    )),
 )
 
 @Composable
