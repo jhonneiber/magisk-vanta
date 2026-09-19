@@ -247,6 +247,37 @@ fun ModuleScreen(
 }
 
 @Composable
+private fun ModulePill(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.secondaryContainer,
+    contentColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSecondaryContainer,
+    enabled: Boolean = true,
+) {
+    FilledTonalButton(
+        modifier = modifier,
+        onClick = onClick,
+        enabled = enabled,
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+        ),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Icon(modifier = Modifier.size(15.dp), imageVector = icon, contentDescription = null)
+            Text(text = label, style = MaterialTheme.typography.labelMedium)
+        }
+    }
+}
+
+@Composable
 private fun ModuleCard(
     item: ModuleItem,
     viewModel: ModuleViewModel,
@@ -343,25 +374,11 @@ private fun ModuleCard(
                     ) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (item.showAction) {
-                                FilledTonalButton(
-                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                                ModulePill(
+                                    icon = Icons.Default.PlayArrow,
+                                    label = stringResource(CoreR.string.module_action),
                                     onClick = { viewModel.runAction(item.module.id, item.module.name) },
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    ) {
-                                        Icon(
-                                            modifier = Modifier.size(18.dp),
-                                            imageVector = Icons.Default.PlayArrow,
-                                            contentDescription = stringResource(CoreR.string.module_action)
-                                        )
-                                        Text(
-                                            text = stringResource(CoreR.string.module_action),
-                                            style = MaterialTheme.typography.labelLarge,
-                                        )
-                                    }
-                                }
+                                )
                             }
                         }
                     }
@@ -373,63 +390,35 @@ private fun ModuleCard(
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
-                        FilledTonalButton(
+                        ModulePill(
                             modifier = Modifier.padding(end = 8.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = colorScheme.tertiaryContainer,
-                                contentColor = colorScheme.onTertiaryContainer
-                            ),
-                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                            icon = Icons.Default.CloudUpload,
+                            label = stringResource(CoreR.string.update),
+                            containerColor = colorScheme.tertiaryContainer,
+                            contentColor = colorScheme.onTertiaryContainer,
                             onClick = { onUpdateClick(item.module.updateInfo) },
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                Icon(
-                                    modifier = Modifier.size(18.dp),
-                                    imageVector = Icons.Default.CloudUpload,
-                                    contentDescription = stringResource(CoreR.string.update),
-                                )
-                                Text(
-                                    text = stringResource(CoreR.string.update),
-                                    style = MaterialTheme.typography.labelLarge,
-                                )
-                            }
-                        }
+                        )
                     }
 
-                    FilledTonalButton(
-                        colors = if (item.isRemoved) {
-                            ButtonDefaults.filledTonalButtonColors()
+                    ModulePill(
+                        icon = if (item.isRemoved) Icons.AutoMirrored.Filled.Undo else Icons.Default.Delete,
+                        label = stringResource(
+                            if (item.isRemoved) CoreR.string.module_state_restore
+                            else CoreR.string.module_state_remove
+                        ),
+                        containerColor = if (item.isRemoved) {
+                            colorScheme.secondaryContainer
                         } else {
-                            ButtonDefaults.filledTonalButtonColors(
-                                containerColor = colorScheme.errorContainer,
-                                contentColor = colorScheme.onErrorContainer
-                            )
+                            colorScheme.errorContainer
                         },
-                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                        contentColor = if (item.isRemoved) {
+                            colorScheme.onSecondaryContainer
+                        } else {
+                            colorScheme.onErrorContainer
+                        },
+                        enabled = !item.isUpdated,
                         onClick = { viewModel.toggleRemove(item) },
-                        enabled = !item.isUpdated
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(18.dp),
-                                imageVector = if (item.isRemoved) Icons.AutoMirrored.Filled.Undo else Icons.Default.Delete,
-                                contentDescription = null
-                            )
-                            Text(
-                                text = stringResource(
-                                    if (item.isRemoved) CoreR.string.module_state_restore
-                                    else CoreR.string.module_state_remove
-                                ),
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
-                    }
+                    )
                 }
             }
         }
