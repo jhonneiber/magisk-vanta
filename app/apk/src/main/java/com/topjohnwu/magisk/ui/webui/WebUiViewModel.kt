@@ -24,7 +24,7 @@ class WebUiViewModel : BaseViewModel() {
      * never needs a raw shell to serve module assets to the WebView.
      */
     val webRoot: ExtendedFile
-        get() = RootUtils.fs.getFile(Const.MODULE_PATH, moduleId, "webroot")
+        get() = RootUtils.fs.getFile(Const.MODULE_PATH, moduleId).getChildFile("webroot")
 
     fun checkRootAccess() {
         // The module ships a webroot/index.html, but if the device has no
