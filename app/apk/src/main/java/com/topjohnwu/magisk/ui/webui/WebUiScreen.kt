@@ -78,8 +78,11 @@ private class ModuleAssetPathHandler(
     }
 }
 
-/** Exposed to module JS as `window.magisk.moduleId()`. */
+/** Exposed to module JS as `window.magisk.exec(cmd)` / `window.magisk.moduleId()`. */
 private class ModuleJsBridge(private val viewModel: WebUiViewModel) {
+    @JavascriptInterface
+    fun exec(cmd: String): String = viewModel.execForModule(cmd)
+
     @JavascriptInterface
     fun moduleId(): String = viewModel.moduleId
 }

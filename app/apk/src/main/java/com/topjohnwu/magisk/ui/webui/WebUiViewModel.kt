@@ -4,6 +4,7 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.nio.ExtendedFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,5 +31,17 @@ class WebUiViewModel : BaseViewModel() {
         // working root at all there's nothing the module's WebUI could ever
         // do, so surface that up front instead of loading a dead page.
         _rootDenied.value = !Info.isRooted
+    }
+
+    /**
+     * Minimal shell bridge exposed to the module's WebUI. Runs with the same
+     * root privileges as the rest of the Magisk app (libsu's global root
+     * shell) — there is currently no additional per-module sandboxing
+     * beyond "the module already lives under /data/adb/modules".
+     */
+    fun execForModule(cmd: String): String {
+        if (!Info.isRooted) return ""
+        val result = Shell.cmd("cd ${Const.MODULE_PATH}/$moduleId && $cmd").exec()
+        return result.out.joinToString("\n")
     }
 }
