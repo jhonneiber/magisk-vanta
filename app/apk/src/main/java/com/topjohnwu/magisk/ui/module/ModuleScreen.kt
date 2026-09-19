@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.ButtonDefaults
 import com.topjohnwu.magisk.ui.glass.GlassCard
 import androidx.compose.material3.CircularProgressIndicator
@@ -358,6 +359,27 @@ private fun ModuleCard(
                                         )
                                         Text(
                                             text = stringResource(CoreR.string.module_action),
+                                            style = MaterialTheme.typography.labelLarge,
+                                        )
+                                    }
+                                }
+                            }
+                            if (item.showWebUi) {
+                                FilledTonalButton(
+                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                                    onClick = { viewModel.openWebUi(item.module.id, item.module.name) },
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    ) {
+                                        Icon(
+                                            modifier = Modifier.size(18.dp),
+                                            imageVector = Icons.Default.Web,
+                                            contentDescription = stringResource(CoreR.string.module_action_webui)
+                                        )
+                                        Text(
+                                            text = stringResource(CoreR.string.module_action_webui),
                                             style = MaterialTheme.typography.labelLarge,
                                         )
                                     }

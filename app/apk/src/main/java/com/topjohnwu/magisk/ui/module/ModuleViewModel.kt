@@ -33,6 +33,7 @@ data class ModuleItem(
 ) {
     val showNotice: Boolean
     val showAction: Boolean
+    val showWebUi: Boolean
     val noticeText: TextHolder
     val isUpdated = module.updated
     val updateReady get() = module.outdated && !isRemoved && isEnabled
@@ -46,6 +47,7 @@ data class ModuleItem(
             (Info.isZygiskEnabled && isRiru) ||
             (!Info.isZygiskEnabled && isZygisk)
         showAction = module.hasAction && !showNotice
+        showWebUi = module.hasWebUi && !showNotice
         noticeText =
             when {
                 zygiskUnloaded -> CoreR.string.zygisk_module_unloaded.asText()
@@ -119,6 +121,10 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     fun runAction(id: String, name: String) {
         navigateTo(Route.Action(id, name))
+    }
+
+    fun openWebUi(id: String, name: String) {
+        navigateTo(Route.WebUi(id, name))
     }
 
     fun toggleEnabled(item: ModuleItem) {
