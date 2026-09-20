@@ -382,25 +382,11 @@ private fun ModuleCard(
                                 )
                             }
                             if (item.showWebUi) {
-                                FilledTonalButton(
-                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                                ModulePill(
+                                    icon = Icons.Default.Web,
+                                    label = stringResource(CoreR.string.module_action_webui),
                                     onClick = { viewModel.openWebUi(item.module.id, item.module.name) },
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    ) {
-                                        Icon(
-                                            modifier = Modifier.size(18.dp),
-                                            imageVector = Icons.Default.Web,
-                                            contentDescription = stringResource(CoreR.string.module_action_webui)
-                                        )
-                                        Text(
-                                            text = stringResource(CoreR.string.module_action_webui),
-                                            style = MaterialTheme.typography.labelLarge,
-                                        )
-                                    }
-                                }
+                                )
                             }
                         }
                     }
