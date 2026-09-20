@@ -30,11 +30,13 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -287,6 +289,14 @@ fun HomeScreen(
                 version = uiState.magiskInstalledVersion,
                 onInstallClicked = { showInstallDialog = true }
             )
+
+            if (Info.env.isActive) {
+                HomeStatsRow(
+                    moduleCount = uiState.moduleCount,
+                    suGrantedCount = uiState.suGrantedCount,
+                    showSuperuser = Info.showSuperUser,
+                )
+            }
 
             StatusCard()
 
@@ -675,6 +685,84 @@ private fun AppDetailRow(
 }
 
 private data class StatusInfo(val label: String, val status: String)
+
+/**
+ * A compact stats row below the core status card, in the spirit of Kitsune
+ * Mask's home screen: quick counts the user cares about, one tap away from
+ * the full screen via [onModulesClick] / [onSuperuserClick].
+ */
+@Composable
+private fun HomeStatsRow(
+    moduleCount: Int,
+    suGrantedCount: Int,
+    showSuperuser: Boolean,
+    modifier: Modifier = Modifier,
+    onModulesClick: (() -> Unit)? = null,
+    onSuperuserClick: (() -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        HomeStatPill(
+            modifier = Modifier.weight(1f),
+            icon = Icons.Default.Extension,
+            count = moduleCount,
+            label = stringResource(CoreR.string.modules),
+            onClick = onModulesClick,
+        )
+        if (showSuperuser) {
+            HomeStatPill(
+                modifier = Modifier.weight(1f),
+                icon = Icons.Default.Shield,
+                count = suGrantedCount,
+                label = stringResource(CoreR.string.superuser),
+                onClick = onSuperuserClick,
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeStatPill(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    count: Int,
+    label: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+) {
+    GlassCard(
+        modifier = modifier,
+        shape = RoundedCornerShape(18.dp),
+        onClick = onClick,
+        enabled = onClick != null,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp),
+            )
+            Column {
+                Text(
+                    text = count.toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
 
 @Composable
 private fun StatusCard(

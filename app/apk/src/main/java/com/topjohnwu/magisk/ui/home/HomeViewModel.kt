@@ -12,14 +12,19 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.model.module.LocalModule
+import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.utils.asFlow
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.topjohnwu.magisk.core.R as CoreR
 
 class HomeViewModel(
@@ -42,6 +47,8 @@ class HomeViewModel(
         val magiskState: State = computeMagiskState(),
         val magiskInstalledVersion: String = computeMagiskInstalledVersion(),
         val managerInstalledVersion: String = computeManagerInstalledVersion(),
+        val moduleCount: Int = 0,
+        val suGrantedCount: Int = 0,
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -102,6 +109,20 @@ class HomeViewModel(
             _uiState.update { it.copy(appState = State.INVALID, managerRemoteVersion = "") }
         }
         ensureEnv()
+        fetchHomeStats()
+    }
+
+    private suspend fun fetchHomeStats() {
+        val counts = withContext(Dispatchers.IO) {
+            val modules = runCatching { LocalModule.installed().size }.getOrDefault(0)
+            val granted = if (Info.showSuperUser) {
+                runCatching {
+                    ServiceLocator.policyDB.fetchAll().count { it.policy >= SuPolicy.ALLOW }
+                }.getOrDefault(0)
+            } else 0
+            modules to granted
+        }
+        _uiState.update { it.copy(moduleCount = counts.first, suGrantedCount = counts.second) }
     }
 
     fun onLinkPressed(link: String) {
